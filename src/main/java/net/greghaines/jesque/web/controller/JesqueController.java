@@ -347,31 +347,40 @@ public class JesqueController {
     }
 
     private WorkerValues addWorkersAttributes(final String workerName, final Model model, final boolean poll) {
-        final WorkerInfo workerInfo = this.workerInfoDAO.getWorker(workerName);
-        final Map<String, List<WorkerInfo>> hostMap = this.workerInfoDAO.getWorkerHostMap();
-        final String activeSubTab;
-        final String viewName;
-        if (workerInfo != null) { // Display workers detail
-            activeSubTab = workerInfo.getHost();
-            viewName = "workers-detail";
-            model.addAttribute("worker", workerInfo);
-        } else if (!hostMap.containsKey(workerName) && !"all".equalsIgnoreCase(workerName)) {
-            // Unknown worker name
-            activeSubTab = null;
-            viewName = "workers-detail";
-        } else { // Display a list of workers
-            viewName = "workers";
-            addPollController(model, workerName, poll);
-            if ("all".equalsIgnoreCase(workerName)) {
+
+        try {
+
+            final WorkerInfo workerInfo = this.workerInfoDAO.getWorker(workerName);
+            final Map<String, List<WorkerInfo>> hostMap = this.workerInfoDAO.getWorkerHostMap();
+            final String activeSubTab;
+            final String viewName;
+            if (workerInfo != null) { // Display workers detail
+                activeSubTab = workerInfo.getHost();
+                viewName = "workers-detail";
+                model.addAttribute("worker", workerInfo);
+            } else if (!hostMap.containsKey(workerName) && !"all".equalsIgnoreCase(workerName)) {
+                // Unknown worker name
                 activeSubTab = null;
-                model.addAttribute("workers", combineWorkerInfos(hostMap));
-            } else {
-                activeSubTab = workerName;
-                model.addAttribute("workers", hostMap.get(workerName));
+                viewName = "workers-detail";
+            } else { // Display a list of workers
+                viewName = "workers";
+                addPollController(model, workerName, poll);
+                if ("all".equalsIgnoreCase(workerName)) {
+                    activeSubTab = null;
+                    model.addAttribute("workers", combineWorkerInfos(hostMap));
+                } else {
+                    activeSubTab = workerName;
+                    model.addAttribute("workers", hostMap.get(workerName));
+                }
             }
+            final List<String> subTabs = (hostMap.size() > 1) ? new ArrayList<String>(hostMap.keySet()) : null;
+            return new WorkerValues(activeSubTab, viewName, subTabs);
+
+        } catch (RuntimeException e) {
+
         }
-        final List<String> subTabs = (hostMap.size() > 1) ? new ArrayList<String>(hostMap.keySet()) : null;
-        return new WorkerValues(activeSubTab, viewName, subTabs);
+        return null;
+
     }
 
     private void addWorkingAttributes(final Model model) {
