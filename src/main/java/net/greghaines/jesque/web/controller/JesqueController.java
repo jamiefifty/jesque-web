@@ -64,9 +64,9 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 
 @Controller("jesqueController")
 public class JesqueController {
-    
-    private static final List<String> tabs = 
-            Arrays.asList("Overview", "Working", "Failed", "Queues", "Workers", "Stats");
+
+    private static final List<String> tabs
+            = Arrays.asList("Overview", "Working", "Failed", "Queues", "Workers", "Stats");
     private static final List<String> statsSubTabs = Arrays.asList("resque", "redis", "keys");
     private static final Pattern whitespacePattern = Pattern.compile("\\s+");
 
@@ -324,18 +324,26 @@ public class JesqueController {
     }
 
     private String addWorkersAttributes(final Model model, final boolean poll) {
-        final Map<String, List<WorkerInfo>> hostMap = this.workerInfoDAO.getWorkerHostMap();
-        final String viewName;
-        if (hostMap.size() == 1) {
-            model.addAttribute("workers", combineWorkerInfos(hostMap));
-            addPollController(model, "workers", poll);
-            viewName = "workers";
-        } else {
-            model.addAttribute("hostMap", hostMap);
-            model.addAttribute("totalWorkerCount", totalWorkerInfoCount(hostMap));
-            viewName = "workers-hosts";
+
+        try {
+
+            final Map<String, List<WorkerInfo>> hostMap = this.workerInfoDAO.getWorkerHostMap();
+            final String viewName;
+            if (hostMap.size() == 1) {
+                model.addAttribute("workers", combineWorkerInfos(hostMap));
+                addPollController(model, "workers", poll);
+                viewName = "workers";
+            } else {
+                model.addAttribute("hostMap", hostMap);
+                model.addAttribute("totalWorkerCount", totalWorkerInfoCount(hostMap));
+                viewName = "workers-hosts";
+            }
+            return viewName;
+        } catch (RuntimeException e) {
+
         }
-        return viewName;
+
+        return null;
     }
 
     private WorkerValues addWorkersAttributes(final String workerName, final Model model, final boolean poll) {
@@ -419,6 +427,7 @@ public class JesqueController {
     }
 
     private static final class WorkerValues {
+
         private final String activeSubTab;
         private final String viewName;
         private final List<String> subTabs;
