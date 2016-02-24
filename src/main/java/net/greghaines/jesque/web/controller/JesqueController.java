@@ -257,16 +257,23 @@ public class JesqueController {
     }
 
     private Map<String, Object> createResqueStats() {
+
         final Map<String, Object> resqueStats = new LinkedHashMap<String, Object>();
-        resqueStats.put("environment", "development");
-        resqueStats.put("failed", this.failureDAO.getCount());
-        resqueStats.put("pending", this.queueInfoDAO.getPendingCount());
-        resqueStats.put("processed", this.queueInfoDAO.getProcessedCount());
-        resqueStats.put("queues", this.queueInfoDAO.getQueueNames().size());
-        resqueStats.put("servers", "[\"" + this.redisURI + "\"]");
-        resqueStats.put("workers", this.workerInfoDAO.getWorkerCount());
-        resqueStats.put("working", this.workerInfoDAO.getActiveWorkerCount());
-        resqueStats.put("paused", this.workerInfoDAO.getPausedWorkerCount());
+        try {
+            resqueStats.put("environment", "development");
+            resqueStats.put("failed", this.failureDAO.getCount());
+            resqueStats.put("pending", this.queueInfoDAO.getPendingCount());
+            resqueStats.put("processed", this.queueInfoDAO.getProcessedCount());
+            resqueStats.put("queues", this.queueInfoDAO.getQueueNames().size());
+            resqueStats.put("servers", "[\"" + this.redisURI + "\"]");
+            resqueStats.put("workers", this.workerInfoDAO.getWorkerCount());
+            resqueStats.put("working", this.workerInfoDAO.getActiveWorkerCount());
+            resqueStats.put("paused", this.workerInfoDAO.getPausedWorkerCount());
+
+        } catch (RuntimeException e) {
+
+        }
+
         return resqueStats;
     }
 
@@ -404,7 +411,6 @@ public class JesqueController {
     }
 
     private void addHeaderAttributes(final Model model, final String activeTab, final List<String> subTabs,
-         
             final String activeSubTab) {
         model.addAttribute("tabs", tabs);
         model.addAttribute("activeTab", activeTab);
