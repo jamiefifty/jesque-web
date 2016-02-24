@@ -384,16 +384,27 @@ public class JesqueController {
     }
 
     private void addWorkingAttributes(final Model model) {
-        model.addAttribute("totalWorkerCount", this.workerInfoDAO.getWorkerCount());
-        model.addAttribute("working", this.workerInfoDAO.getActiveWorkers());
+        try {
+            model.addAttribute("totalWorkerCount", this.workerInfoDAO.getWorkerCount());
+            model.addAttribute("working", this.workerInfoDAO.getActiveWorkers());
+        } catch (RuntimeException e) {
+
+        }
+
     }
 
     private void addQueuesAttributes(final Model model) {
-        model.addAttribute("queues", this.queueInfoDAO.getQueueInfos());
-        model.addAttribute("totalFailureCount", this.failureDAO.getCount());
+        try {
+            model.addAttribute("queues", this.queueInfoDAO.getQueueInfos());
+            model.addAttribute("totalFailureCount", this.failureDAO.getCount());
+        } catch (RuntimeException e) {
+
+        }
+
     }
 
     private void addHeaderAttributes(final Model model, final String activeTab, final List<String> subTabs,
+         
             final String activeSubTab) {
         model.addAttribute("tabs", tabs);
         model.addAttribute("activeTab", activeTab);
